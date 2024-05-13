@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
 public class DecompressAction extends Action {
   private static final Logger LOG = LoggerFactory.getLogger(DecompressAction.class);
   private static final int BUFFER_SIZE = 8024; // Matches default buffer size in IOUtils
+  private static final boolean DECOMPRESS_UNTIL_EOF = true;
 
   private DecompressActionConfig config;
 
@@ -184,7 +185,7 @@ public class DecompressAction extends Action {
     Path actualDestPath = (fileSystem.isDirectory(dest))
       ? new Path(dest.toString() + "/" + source.getName().substring(0, source.getName().lastIndexOf(".")))
       : dest;
-    try (CompressorInputStream input = new CompressorStreamFactory()
+    try (CompressorInputStream input = new CompressorStreamFactory(DECOMPRESS_UNTIL_EOF)
       .createCompressorInputStream(new BufferedInputStream(fileSystem.open(source)));
          BufferedOutputStream out = new BufferedOutputStream(fileSystem.create(actualDestPath), BUFFER_SIZE)) {
       IOUtils.copy(input, out);
